@@ -9,6 +9,8 @@ import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.tfod.TfodProcessor;
+
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
@@ -64,16 +66,21 @@ public class AutoHell extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
             while (opModeIsActive()) {
+//                Motor01.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                Motor02.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                Motor03.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                Motor04.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                telemetryTfod();
-                if (gamepad1.dpad_down) {
-                    visionPortal.stopStreaming();
-                } else if (gamepad1.dpad_up) {
-                    visionPortal.resumeStreaming();
+                if (gamepad1.a) {
+                    telemetry.addData("Starting at",  "%7d :%7d",
+                            Motor01.getCurrentPosition(),
+                            Motor02.getCurrentPosition(),
+                            Motor03.getCurrentPosition(),
+                            Motor04.getCurrentPosition());
                 }
 
-                // Share the CPU.
-                sleep(20);
+
+
             }
         }
 
