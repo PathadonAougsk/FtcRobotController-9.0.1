@@ -75,10 +75,10 @@ public class BasicOP extends LinearOpMode {
         // Initialize the hardware variables. Note that the strings used here as parameters
         // to 'get' must correspond to the names assigned during the robot configuration
         // step (using the FTC Robot Controller app on the phone).
-        FrontDrive = hardwareMap.get(DcMotor.class, "front_drive"); //0
-        BackDrive = hardwareMap.get(DcMotor.class, "back_drive"); //1
-        leftDrive  = hardwareMap.get(DcMotor.class, "left_drive"); //2
-        rightDrive = hardwareMap.get(DcMotor.class, "right_drive"); //3
+        FrontDrive = hardwareMap.get(DcMotor.class, "Motor01"); //0
+        BackDrive = hardwareMap.get(DcMotor.class, "Motor02"); //1
+        leftDrive  = hardwareMap.get(DcMotor.class, "Motor03"); //2
+        rightDrive = hardwareMap.get(DcMotor.class, "Motor04"); //3
         leftServo = hardwareMap.get(Servo.class, "Servo_left"); //0
         rightServo = hardwareMap.get(Servo.class, "Servo_right"); //1
         servoTest = hardwareMap.get(CRServo.class, "Servo");

@@ -34,7 +34,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 /*
@@ -82,8 +82,21 @@ public class control extends LinearOpMode {
         double velocity_forward = 1400;
         double velocity_backward = -1400;
         double brake = 0;
+        double range_motor = 0;
 
         while (opModeIsActive()) {
+            if (gamepad1.left_bumper){
+                range_motor = range_motor + 0.01;
+                servo_left.setPosition(range_motor);
+                servo_right.setPosition(range_motor);
+            }
+
+            if (gamepad1.right_bumper){
+                range_motor = range_motor - 0.01;
+                servo_left.setPosition(range_motor);
+                servo_right.setPosition(range_motor);
+            }
+
             if(gamepad1.dpad_up){
                 Motor01.setVelocity(velocity_forward);
                 Motor02.setVelocity(velocity_forward);

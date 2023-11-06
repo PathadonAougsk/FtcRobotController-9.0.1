@@ -70,7 +70,7 @@ public class AutoHell extends LinearOpMode {
 //                Motor02.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                Motor03.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                Motor04.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
+               
                 if (gamepad1.a) {
                     telemetry.addData("Starting at",  "%7d :%7d",
                             Motor01.getCurrentPosition(),
@@ -79,6 +79,11 @@ public class AutoHell extends LinearOpMode {
                             Motor04.getCurrentPosition());
                 }
 
+                if (gamepad1.b){
+                    // Maybe we can add some way to safe this data if that necessary
+                    // Track movement?
+                    // when certain time hit?
+                }
 
 
             }
