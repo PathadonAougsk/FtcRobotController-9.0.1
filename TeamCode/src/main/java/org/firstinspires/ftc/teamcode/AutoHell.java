@@ -80,12 +80,13 @@ public class AutoHell extends LinearOpMode {
                 }
 
                 if (gamepad1.b){
+
                     // Maybe we can add some way to safe this data if that necessary
                     // Track movement?
                     // when certain time hit?
                 }
 
-
+                telemetry.update();
             }
         }
 

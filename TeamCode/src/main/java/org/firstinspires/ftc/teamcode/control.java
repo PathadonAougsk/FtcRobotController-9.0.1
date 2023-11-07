@@ -59,6 +59,8 @@ public class control extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        ElapsedTime runtime = new ElapsedTime();
+
         DcMotorEx Motor01 = hardwareMap.get(DcMotorEx.class, "Motor01");
         DcMotorEx Motor02 = hardwareMap.get(DcMotorEx.class, "Motor02");
         DcMotorEx Motor03 = hardwareMap.get(DcMotorEx.class, "Motor03");
@@ -76,7 +78,7 @@ public class control extends LinearOpMode {
 
         Servo servo_left = hardwareMap.get(Servo.class, "Servo_left");
         Servo servo_right = hardwareMap.get(Servo.class, "Servo_right");
-
+        servo_right.setDirection(Servo.Direction.REVERSE);
         double velocity_still = 0;
 //      Go calculate that shit.
         double velocity_forward = 1400;
@@ -84,15 +86,17 @@ public class control extends LinearOpMode {
         double brake = 0;
         double range_motor = 0;
 
+        waitForStart();
+
         while (opModeIsActive()) {
             if (gamepad1.left_bumper){
-                range_motor = range_motor + 0.01;
+                range_motor = range_motor + 0.005;
                 servo_left.setPosition(range_motor);
                 servo_right.setPosition(range_motor);
             }
 
             if (gamepad1.right_bumper){
-                range_motor = range_motor - 0.01;
+                range_motor = range_motor - 0.005;
                 servo_left.setPosition(range_motor);
                 servo_right.setPosition(range_motor);
             }
@@ -124,6 +128,11 @@ public class control extends LinearOpMode {
                 Motor03.setVelocity(velocity_backward);
                 Motor04.setVelocity(velocity_backward);
             }
+
+            telemetry.addData("time running", "Run Time: " + runtime.toString());
+            telemetry.addData("Currently at",  " at %7d :%7d",
+                    Motor01.getCurrentPosition(), Motor02.getCurrentPosition());
+            telemetry.update();
         }
     }
 }
