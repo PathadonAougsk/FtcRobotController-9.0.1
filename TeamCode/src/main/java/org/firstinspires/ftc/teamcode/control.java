@@ -59,12 +59,15 @@ public class control extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
+        // Player One control Movement + Paper plane
+        // Player Two control Servo + hand
         ElapsedTime runtime = new ElapsedTime();
 
         DcMotorEx Motor01 = hardwareMap.get(DcMotorEx.class, "Motor01");
         DcMotorEx Motor02 = hardwareMap.get(DcMotorEx.class, "Motor02");
         DcMotorEx Motor03 = hardwareMap.get(DcMotorEx.class, "Motor03");
         DcMotorEx Motor04 = hardwareMap.get(DcMotorEx.class, "Motor04");
+        DcMotorEx _GearMotor = hardwareMap.get(DcMotorEx.class, "Motor05");
 
         Motor01.setDirection(DcMotor.Direction.FORWARD);
         Motor02.setDirection(DcMotor.Direction.REVERSE);
@@ -78,6 +81,9 @@ public class control extends LinearOpMode {
 
         Servo servo_left = hardwareMap.get(Servo.class, "Servo_left");
         Servo servo_right = hardwareMap.get(Servo.class, "Servo_right");
+        Servo arm_right = hardwareMap.get(Servo.class, "Servo_arm1");
+        Servo arm_left = hardwareMap.get(Servo.class, "Servo_arm2");
+
         servo_right.setDirection(Servo.Direction.REVERSE);
         double velocity_still = 0;
 //      Go calculate that shit.
@@ -86,11 +92,19 @@ public class control extends LinearOpMode {
         double brake = 0;
         double range_motor = 0;
 
+        double x = gamepad1.left_stick_x;
+        double y = gamepad1.left_stick_y;
+
+        double rotate = gamepad1.right_stick_x;
+
         waitForStart();
 
         while (opModeIsActive()) {
+
             if (gamepad1.left_bumper){
                 range_motor = range_motor + 0.005;
+                servo_left.getPosition();
+                servo_right.getPosition();
                 servo_left.setPosition(range_motor);
                 servo_right.setPosition(range_motor);
             }
@@ -99,6 +113,17 @@ public class control extends LinearOpMode {
                 range_motor = range_motor - 0.005;
                 servo_left.setPosition(range_motor);
                 servo_right.setPosition(range_motor);
+            }
+
+            if (gamepad1.x){
+                // Let's check for the encoder for the height so we can set the limit
+                // if (encoder < height){
+                _GearMotor.setVelocity(velocity_forward);
+            }
+
+            if (gamepad1.a){
+                // if (encoder > miniHeight)
+                _GearMotor.setVelocity(velocity_backward);
             }
 
             if(gamepad1.dpad_up){
@@ -132,6 +157,7 @@ public class control extends LinearOpMode {
             telemetry.addData("time running", "Run Time: " + runtime.toString());
             telemetry.addData("Currently at",  " at %7d :%7d",
                     Motor01.getCurrentPosition(), Motor02.getCurrentPosition());
+            telemetry.addData("Currently at",  " at %7f :%7f",servo_left.getPosition(), servo_right.getPosition());
             telemetry.update();
         }
     }
