@@ -163,6 +163,19 @@ public class Movement_revamp extends LinearOpMode {
                     Pixel_servo.setPosition(1);
                 }
             }
+
+            telemetry.addData("Separator", "--------------------------------------------");
+            telemetry.addData("Servo_arm1_Position", Servo_arm1.getPosition());
+            telemetry.addData("Servo_arm2_Position", Servo_arm2.getPosition());
+            telemetry.addData("Servo_hand1_Position", Servo_hand1.getPosition());
+            telemetry.addData("Servo_hand2_Position", Servo_hand2.getPosition());
+            telemetry.addData("Separator", "----------------Encoder_Debug------------------");
+            telemetry.addData("Encoder Positions", "Motor1: " + Motor01.getCurrentPosition() +
+                    ", Motor2: " + Motor02.getCurrentPosition() +
+                    ", Motor3: " + Motor03.getCurrentPosition() +
+                    ", Motor4: " + Motor04.getCurrentPosition());
+
+            telemetry.update();
         }
     }
 }
