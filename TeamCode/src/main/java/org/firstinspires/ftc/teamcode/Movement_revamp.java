@@ -2,12 +2,18 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-@TeleOp(name="control", group="Linear OpMode")
+import java.sql.Time;
+import java.util.Timer;
+
+@TeleOp(name="Movement_Revamp", group="Linear OpMode")
 public class Movement_revamp extends LinearOpMode {
+    private ElapsedTime runtime = new ElapsedTime();
     @Override
     public void runOpMode(){
         DcMotorEx Motor01 = hardwareMap.get(DcMotorEx.class, "Motor01");
@@ -35,36 +41,51 @@ public class Movement_revamp extends LinearOpMode {
         Servo Pixel_servo = hardwareMap.get(Servo.class, "pixel_servo");
         Servo Airplane = hardwareMap.get(Servo.class, "air_servo");
 
+        Servo_arm1.setDirection(Servo.Direction.REVERSE);
+        Servo_hand1.setDirection(Servo.Direction.REVERSE);
         double mappedServoPosition;
         double velocity = 1400;
         double still = 0;
-        double range_motor_arm = 0;
-        double range_motor_hand = 0;
 
         double x,y,rotate;
         boolean trigger_left;
         boolean trigger_right;
+        double range_motor_arm = 0;
+        double range_motor_hand = 0;
+        boolean Isit_1 = true;
+        boolean isMovingToPosition1 = false;
 
-        Servo_arm1.scaleRange(160, 360);
-        Servo_arm2.scaleRange(160, 360);
 
+
+        if (Servo_hand1.getPosition() != 0 || Servo_hand2.getPosition() != 0){
+            Servo_hand1.setPosition(0);
+            Servo_hand2.setPosition(0);
+        }
+
+        Pixel_servo.setPosition(1);
 
         waitForStart();
 
-        while (opModeIsActive()){
-            // before game start
-            if (Servo_arm1.getPosition() != 0 || Servo_arm1.getPosition() != 0){
-                Servo_arm1.setPosition(0);
-                Servo_arm2.setPosition(0);
-            } else if (Servo_hand1.getPosition() != 0 || Servo_hand2.getPosition() != 0){
-                Servo_hand1.setPosition(0);
-                Servo_hand2.setPosition(0);
-            }
 
+        while (opModeIsActive()){
             // after game start
             x = gamepad1.left_stick_x;
             y = gamepad1.left_stick_y;
             rotate = gamepad1.right_stick_x;
+
+            if (range_motor_arm  > 1){
+                range_motor_arm = 1;
+            } else if (range_motor_arm < 0){
+                range_motor_arm = 0;
+            }
+
+            if (gamepad1.right_bumper){
+                velocity = velocity / 3;
+            }
+
+            if (gamepad1.left_bumper){
+                velocity = 1400;
+            }
 
             if (x != 1 && y != 1){
                 Motor01.setVelocity(still);
@@ -79,25 +100,25 @@ public class Movement_revamp extends LinearOpMode {
             }
 
             if (y == 1){
-                Motor01.setVelocity(velocity);
-                Motor02.setVelocity(velocity);
+                Motor01.setVelocity(-velocity);
+                Motor02.setVelocity(-velocity);
                 Motor03.setVelocity(velocity);
                 Motor04.setVelocity(velocity);
             } else if (y == -1) {
-                Motor01.setVelocity(-velocity);
-                Motor02.setVelocity(-velocity);
+                Motor01.setVelocity(velocity);
+                Motor02.setVelocity(velocity);
                 Motor03.setVelocity(-velocity);
                 Motor04.setVelocity(-velocity);
             }
 
             if (x == 1){
-                Motor01.setVelocity(-velocity);
-                Motor02.setVelocity(-velocity);
+                Motor01.setVelocity(velocity);
+                Motor02.setVelocity(velocity);
                 Motor03.setVelocity(velocity);
                 Motor04.setVelocity(velocity);
             } else if (x == -1) {
-                Motor01.setVelocity(velocity);
-                Motor02.setVelocity(velocity);
+                Motor01.setVelocity(-velocity);
+                Motor02.setVelocity(-velocity);
                 Motor03.setVelocity(-velocity);
                 Motor04.setVelocity(-velocity);
             }
@@ -114,68 +135,102 @@ public class Movement_revamp extends LinearOpMode {
                 Motor04.setVelocity(velocity);
             }
 
-            if(gamepad1.a){
+            if(gamepad1.right_bumper){
                 GearMotor.setVelocity(velocity);
-            } else {
+            } else if (gamepad1.left_bumper){
+                GearMotor.setVelocity(-velocity);
+            }else {
                 GearMotor.setVelocity(still);
             }
 
-            if(gamepad2.dpad_up){
-                range_motor_arm = range_motor_arm + 0.05;
-                Servo_arm1.getPosition();
-                Servo_arm2.getPosition();
+            if(gamepad2.right_bumper){
+                range_motor_arm += 0.005;
                 Servo_arm1.setPosition(range_motor_arm);
                 Servo_arm2.setPosition(range_motor_arm);
             }
 
-            if(gamepad2.dpad_down){
-                range_motor_arm = range_motor_arm - 0.05;
-               Servo_arm1.getPosition();
-               Servo_arm2.getPosition();
-               Servo_arm1.setPosition(range_motor_arm);
-               Servo_arm2.setPosition(range_motor_arm);
-            }
-
-            if(gamepad2.right_bumper){
-                range_motor_hand = range_motor_hand + 0.05;
-                Servo_hand1.getPosition();
-                Servo_hand2.getPosition();
-                Servo_hand1.setPosition(range_motor_hand);
-                Servo_hand2.setPosition(range_motor_hand);
-            }
-
             if(gamepad2.left_bumper){
-                range_motor_hand = range_motor_hand - 0.05;
-                Servo_hand1.getPosition();
-                Servo_hand2.getPosition();
+                range_motor_arm -= 0.005;
+                Servo_arm1.setPosition(range_motor_arm);
+                Servo_arm2.setPosition(range_motor_arm);
+            }
+
+            if (gamepad2.a){
+                Servo_arm1.setPosition(0.5);
+                Servo_arm2.setPosition(0.5);
+            }
+
+            if (gamepad2.left_bumper){
+                Servo_arm1.setPosition(0);
+                Servo_arm2.setPosition(0);
+            }
+
+            if(gamepad2.dpad_up){
+                range_motor_hand += 0.05;
                 Servo_hand1.setPosition(range_motor_hand);
                 Servo_hand2.setPosition(range_motor_hand);
             }
+
+            if (gamepad2.dpad_down)
+            {
+                range_motor_hand -= 0.05;
+                Servo_hand1.setPosition(range_motor_hand);
+                Servo_hand2.setPosition(range_motor_hand);
+            }
+
 
             if (gamepad1.a){
                 Airplane.setPosition(1);
             }
 
             if (gamepad2.a){
-                if (Pixel_servo.getPosition() != 0){
-                    Pixel_servo.setPosition(0);
-                } else {
-                    Pixel_servo.setPosition(1);
-                }
+                Pixel_servo.setPosition(0);
             }
 
+            if (gamepad2.b) {
+                if (Isit_1) {
+                    if (!isMovingToPosition1) {
+                        Pixel_servo.setPosition(0.5);
+                        runtime.reset(); // Reset the timer when setting position to 0.5
+                        isMovingToPosition1 = true;
+                    } else {
+                        if (runtime.milliseconds() >= 1500) { // Check elapsed time
+                            Pixel_servo.setPosition(1);
+                            Isit_1 = false;
+                            isMovingToPosition1 = false;
+                        }
+                    }
+                } else {
+                    if (!isMovingToPosition1) {
+                        Pixel_servo.setPosition(1);
+                        runtime.reset(); // Reset the timer when setting position to 1
+                        isMovingToPosition1 = true;
+                    } else {
+                        if (runtime.milliseconds() >= 1500) { // Check elapsed time
+                            Pixel_servo.setPosition(0.5);
+                            Isit_1 = true;
+                            isMovingToPosition1 = false;
+                        }
+                    }
+                }
+            }
+            telemetry.addData("Yo!", runtime.toString());
             telemetry.addData("Separator", "--------------------------------------------");
             telemetry.addData("Servo_arm1_Position", Servo_arm1.getPosition());
             telemetry.addData("Servo_arm2_Position", Servo_arm2.getPosition());
             telemetry.addData("Servo_hand1_Position", Servo_hand1.getPosition());
             telemetry.addData("Servo_hand2_Position", Servo_hand2.getPosition());
+            telemetry.addData("Pixel_Servo", Pixel_servo.getPosition());
             telemetry.addData("Separator", "----------------Encoder_Debug------------------");
             telemetry.addData("Encoder Positions", "Motor1: " + Motor01.getCurrentPosition() +
                     ", Motor2: " + Motor02.getCurrentPosition() +
                     ", Motor3: " + Motor03.getCurrentPosition() +
                     ", Motor4: " + Motor04.getCurrentPosition());
-
+            telemetry.addData("Is it Pressed?", gamepad2.dpad_up);
+            telemetry.addData("Is it Pressed?", gamepad2.dpad_down);
             telemetry.update();
+            sleep(10);
         }
     }
-}
+  }
+
