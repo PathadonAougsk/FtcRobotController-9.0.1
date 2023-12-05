@@ -43,6 +43,9 @@ public class Movement_revamp extends LinearOpMode {
 
         Servo_arm1.setDirection(Servo.Direction.REVERSE);
         Servo_hand1.setDirection(Servo.Direction.REVERSE);
+        final double HAND_ADJUSTMENT = 0.05; // Amount to adjust the servo position
+        final long SERVO_UPDATE_INTERVAL = 200; // Time interval in milliseconds for servo updates\
+        long lastServoUpdateTime = 0;
         double mappedServoPosition;
         double velocity = 1400;
         double still = 0;
@@ -55,15 +58,14 @@ public class Movement_revamp extends LinearOpMode {
         boolean Isit_1 = true;
         boolean isMovingToPosition1 = false;
 
+        Pixel_servo.scaleRange(0,0.7);
 
-
-        if (Servo_hand1.getPosition() != 0 || Servo_hand2.getPosition() != 0){
-            Servo_hand1.setPosition(0);
-            Servo_hand2.setPosition(0);
-        }
+//        if (Servo_hand1.getPosition() != 0 || Servo_hand2.getPosition() != 0){
+//            Servo_hand1.setPosition(0);
+//            Servo_hand2.setPosition(0);
+//        }
 
         Pixel_servo.setPosition(1);
-
         waitForStart();
 
 
@@ -80,7 +82,7 @@ public class Movement_revamp extends LinearOpMode {
             }
 
             if (gamepad1.right_bumper){
-                velocity = velocity / 3;
+                velocity = 466.7;
             }
 
             if (gamepad1.left_bumper){
@@ -112,15 +114,15 @@ public class Movement_revamp extends LinearOpMode {
             }
 
             if (x == 1){
-                Motor01.setVelocity(velocity);
-                Motor02.setVelocity(velocity);
-                Motor03.setVelocity(velocity);
-                Motor04.setVelocity(velocity);
-            } else if (x == -1) {
                 Motor01.setVelocity(-velocity);
                 Motor02.setVelocity(-velocity);
                 Motor03.setVelocity(-velocity);
                 Motor04.setVelocity(-velocity);
+            } else if (x == -1) {
+                Motor01.setVelocity(velocity);
+                Motor02.setVelocity(velocity);
+                Motor03.setVelocity(velocity);
+                Motor04.setVelocity(velocity);
             }
 
             if (rotate == 1){
@@ -144,38 +146,29 @@ public class Movement_revamp extends LinearOpMode {
             }
 
             if(gamepad2.right_bumper){
-                range_motor_arm += 0.005;
+                range_motor_arm -= 0.5;
                 Servo_arm1.setPosition(range_motor_arm);
                 Servo_arm2.setPosition(range_motor_arm);
             }
 
             if(gamepad2.left_bumper){
-                range_motor_arm -= 0.005;
+                range_motor_arm += 0.05;
                 Servo_arm1.setPosition(range_motor_arm);
                 Servo_arm2.setPosition(range_motor_arm);
             }
 
-            if (gamepad2.a){
-                Servo_arm1.setPosition(0.5);
-                Servo_arm2.setPosition(0.5);
-            }
-
-            if (gamepad2.left_bumper){
-                Servo_arm1.setPosition(0);
-                Servo_arm2.setPosition(0);
-            }
-
-            if(gamepad2.dpad_up){
-                range_motor_hand += 0.05;
+            if (gamepad2.dpad_up && System.currentTimeMillis() - lastServoUpdateTime > SERVO_UPDATE_INTERVAL) {
+                range_motor_hand -= HAND_ADJUSTMENT;
                 Servo_hand1.setPosition(range_motor_hand);
                 Servo_hand2.setPosition(range_motor_hand);
+                lastServoUpdateTime = System.currentTimeMillis();
             }
 
-            if (gamepad2.dpad_down)
-            {
-                range_motor_hand -= 0.05;
+            if (gamepad2.dpad_down && System.currentTimeMillis() - lastServoUpdateTime > SERVO_UPDATE_INTERVAL) {
+                range_motor_hand += HAND_ADJUSTMENT;
                 Servo_hand1.setPosition(range_motor_hand);
                 Servo_hand2.setPosition(range_motor_hand);
+                lastServoUpdateTime = System.currentTimeMillis();
             }
 
 

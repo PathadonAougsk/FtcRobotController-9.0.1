@@ -80,6 +80,8 @@ public class AutoHell extends LinearOpMode {
                 }
 
                 if (gamepad1.b){
+//                    Motor01.setTargetPosition();
+//                    Motor02.setTargetPosition();
 
                     // Maybe we can add some way to safe this data if that necessary
                     // Track movement?
