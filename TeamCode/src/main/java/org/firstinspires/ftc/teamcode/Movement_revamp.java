@@ -58,7 +58,12 @@ public class Movement_revamp extends LinearOpMode {
         boolean Isit_1 = true;
         boolean isMovingToPosition1 = false;
 
-        Pixel_servo.scaleRange(0,0.7);
+        Pixel_servo.scaleRange(0,0.8);
+        Servo_arm1.scaleRange(0,0.7);
+        Servo_arm2.scaleRange(0,0.7);
+        Servo_hand1.scaleRange(0,1);
+        Servo_hand2.scaleRange(0,1);
+
 
 //        if (Servo_hand1.getPosition() != 0 || Servo_hand2.getPosition() != 0){
 //            Servo_hand1.setPosition(0);
@@ -81,11 +86,11 @@ public class Movement_revamp extends LinearOpMode {
                 range_motor_arm = 0;
             }
 
-            if (gamepad1.right_bumper){
+            if (gamepad1.y){
                 velocity = 466.7;
             }
 
-            if (gamepad1.left_bumper){
+            if (gamepad1.x){
                 velocity = 1400;
             }
 

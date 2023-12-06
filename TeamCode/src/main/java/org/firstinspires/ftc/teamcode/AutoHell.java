@@ -16,8 +16,6 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 
-import java.util.List;
-
 @Autonomous(name = "AutoHell", group = "Combined")
 public class AutoHell extends LinearOpMode {
 
@@ -29,7 +27,6 @@ public class AutoHell extends LinearOpMode {
     @Override
     public void runOpMode() {
 
-//        initTfod();
 
         DcMotorEx Motor01 = hardwareMap.get(DcMotorEx.class, "Motor01");
         DcMotorEx Motor02 = hardwareMap.get(DcMotorEx.class, "Motor02");
@@ -66,11 +63,6 @@ public class AutoHell extends LinearOpMode {
         int[] MMotor4 = new int[30];
 
         int i = 0;
-        //เรียกใช้
-        int M1 = MMotor1[i];
-        int M2 = MMotor1[i];
-        int M3 = MMotor1[i];
-        int M4 = MMotor1[i];
         double x,y,rotate;
         boolean trigger_left;
         boolean trigger_right;
@@ -92,14 +84,10 @@ public class AutoHell extends LinearOpMode {
         waitForStart();
         if (opModeIsActive()) {
             while (opModeIsActive()) {
-                MMotor1[i] = M1;
-                MMotor2[i] = M2;
-                MMotor3[i] = M3;
-                MMotor4[i] = M4;
 
                 if (gamepad1.y)
                     while(true) {
-                        { //mapping
+                        { //mapping /w controller
                             x = gamepad1.left_stick_x;
                             y = gamepad1.left_stick_y;
                             rotate = gamepad1.right_stick_x;
@@ -112,8 +100,6 @@ public class AutoHell extends LinearOpMode {
                             if (gamepad1.left_bumper) {
                                 velocity = 1400;
                             }
-//                    Motor01.setTargetPosition();
-//                    Motor02.setTargetPosition();
 
                             if (x != 1 && y != 1) {
                                 Motor01.setVelocity(still);
@@ -163,11 +149,11 @@ public class AutoHell extends LinearOpMode {
                                 Motor04.setVelocity(velocity);
                             }
                             if (gamepad1.x) {
-
-                                M1 = Motor01.getCurrentPosition();
-                                M2 = Motor02.getCurrentPosition();
-                                M3 = Motor03.getCurrentPosition();
-                                M4 = Motor04.getCurrentPosition();
+                                //mapping field
+                                MMotor1[i] = Motor01.getCurrentPosition(); //input encoder's data into array [i] position
+                                MMotor2[i] = Motor02.getCurrentPosition();
+                                MMotor3[i] = Motor03.getCurrentPosition();
+                                MMotor4[i] = Motor04.getCurrentPosition();
                                 i += 1;
                                 telemetry.addData("State = ", i);
                                 telemetry.update();
@@ -175,46 +161,25 @@ public class AutoHell extends LinearOpMode {
                             if (gamepad1.a)
                             {
                                 telemetry.addData("Autonomous Activated ..", "");
+                                i = 0;
                                 break;
                             }
                         }
                     }
-                //main autonomous
-                Motor01.setTargetPosition(M1);
-                Motor02.setTargetPosition(M2);
-                Motor03.setTargetPosition(M3);
-                Motor04.setTargetPosition(M4);
+                //main autonomous running from array's data
+                Motor01.setTargetPosition(MMotor1[i]);
+                Motor02.setTargetPosition(MMotor2[i]);
+                Motor03.setTargetPosition(MMotor3[i]);
+                Motor04.setTargetPosition(MMotor4[i]);
+                i++;
+                telemetry.addData("Running State : ", i);
+                telemetry.update();
             }
 
 
 
         }
 
-    /*private void initTfod() {
-        tfod = TfodProcessor.easyCreateWithDefaults();
-
-        if (USE_WEBCAM) {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    hardwareMap.get(WebcamName.class, "webcam"), tfod);
-        } else {
-            visionPortal = VisionPortal.easyCreateWithDefaults(
-                    BuiltinCameraDirection.BACK, tfod);
-        }
-    }
-
-    private void telemetryTfod() {
-        List<Recognition> currentRecognitions = tfod.getRecognitions();
-        telemetry.addData("# Objects Detected", currentRecognitions.size());
-
-        for (Recognition recognition : currentRecognitions) {
-            double x = (recognition.getLeft() + recognition.getRight()) / 2;
-            double y = (recognition.getTop()  + recognition.getBottom()) / 2;
-
-            telemetry.addData(""," ");
-            telemetry.addData("Image", "%s (%.0f %% Conf.)", recognition.getLabel(), recognition.getConfidence() * 100);
-            telemetry.addData("- Position", "%.0f / %.0f", x, y);
-            telemetry.addData("- Size", "%.0f x %.0f", recognition.getWidth(), recognition.getHeight());
-        }*/
     }
 }
 
