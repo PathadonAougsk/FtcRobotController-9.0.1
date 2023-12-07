@@ -117,8 +117,8 @@
                     // run until the end of the match (driver presses STOP)
                     while (opModeIsActive()) {
 
-                        double currentServoPosition1 = leftServo.getPosition();
-                        double currentServoPosition2 = rightServo.getPosition();
+//                        double currentServoPosition1 = leftServo.getPosition();
+//                        double currentServoPosition2 = rightServo.getPosition();
 
                         // Calculate the errors for both servos
 
@@ -147,41 +147,7 @@
 
                         double rotate = gamepad1.right_stick_x;
 
-                        if (y == 1){
-                            backPower = y;
-                            rightPower = y;
-                            frontPower = y;
-                            leftPower = y;
-                        } else if (y == -1) {
-                            backPower = y;
-                            rightPower = y;
-                            frontPower = y;
-                            leftPower = y;
-                        }
 
-                        if (x == 1){
-                            backPower = x;
-                            rightPower = -x;
-                            frontPower = x;
-                            leftPower = -x;
-                        } else if (x == -1) {
-                            backPower = x; //1
-                            frontPower = x; //0
-                            rightPower = -x; //3
-                            leftPower = -x; //2
-                        }
-
-                        if (rotate == 1){
-                            rightPower = -rotate;
-                            leftPower =   rotate;
-                            frontPower = -rotate;
-                            backPower =   rotate;
-                        } else if (rotate == -1){
-                            rightPower =-rotate;
-                            leftPower =  rotate;
-                            frontPower =-rotate;
-                            backPower =  rotate;
-                        }
 
 
 
@@ -202,8 +168,8 @@
                         telemetry.addData("Direction", "x (%.2f), y (%.2f)", x, y);
                         telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower / slow, rightPower / slow);
                         telemetry.addData("Motors", "front (%.2f), back (%.2f)", frontPower / slow, backPower / slow);
-                        telemetry.addData("Servo_leftPostion", leftServo.getPosition());
-                        telemetry.addData("Servo_rightPostion", rightServo.getPosition());
+//                        telemetry.addData("Servo_leftPostion", leftServo.getPosition());
+//                        telemetry.addData("Servo_rightPostion", rightServo.getPosition());
                         telemetry.update();
                     }
                 }

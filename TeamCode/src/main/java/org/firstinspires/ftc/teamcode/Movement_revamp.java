@@ -6,22 +6,24 @@ import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import java.util.concurrent.Delayed;
+
 @TeleOp(name="Movement_Revamp", group="Linear OpMode")
 public class Movement_revamp extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
-    private DcMotorEx Motor01, Motor02, Motor03, Motor04, GearMotor;
+    private DcMotor Motor01, Motor02, Motor03, Motor04, GearMotor;
     private Servo Servo_arm1, Servo_arm2, Servo_hand1, Servo_hand2, Pixel_servo, Airplane;
-    private double velocity = 1400;
     private final double still = 0;
     private double range_motor_arm = 0;
     private double range_motor_hand = 0;
-    private boolean Isit_1 = true;
-    private boolean isMovingToPosition1 = false;
+    double slow;
     String[] servo_list = {"Arm", "Hand", "Pixel", "Airplane"};
     private long lastServoUpdateTime = 0;
     @Override
     public void runOpMode(){
         initializeHardware();
+        Servo_arm1.setPosition(0.5);
+        Servo_arm2.setPosition(0.5);
         waitForStart();
         while (opModeIsActive()){
             // after game start
@@ -29,64 +31,68 @@ public class Movement_revamp extends LinearOpMode {
                 Debug();
             }
 
+            double leftPower = 0;
+            double rightPower = 0;
+            double frontPower = 0;
+            double backPower = 0;
+
             double x = gamepad1.left_stick_x;
             double y = gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
-            if (x != 1 && y != 1){
-                Motor01.setVelocity(still);
-                Motor02.setVelocity(still);
-                Motor03.setVelocity(still);
-                Motor04.setVelocity(still);
-            } else if (x != -1 && y != -1){
-                Motor01.setVelocity(still);
-                Motor02.setVelocity(still);
-                Motor03.setVelocity(still);
-                Motor04.setVelocity(still);
-            }
 
             if (y == 1){
-                Motor01.setVelocity(-velocity);
-                Motor02.setVelocity(-velocity);
-                Motor03.setVelocity(velocity);
-                Motor04.setVelocity(velocity);
-            } else if (y == -1) {
-                Motor01.setVelocity(velocity);
-                Motor02.setVelocity(velocity);
-                Motor03.setVelocity(-velocity);
-                Motor04.setVelocity(-velocity);
+                backPower = -y; //1
+                frontPower = -y; //0
+                rightPower = y; //3
+                leftPower = y; //2
             }
 
-            if (x == 1){
-                Motor01.setVelocity(-velocity);
-                Motor02.setVelocity(-velocity);
-                Motor03.setVelocity(-velocity);
-                Motor04.setVelocity(-velocity);
-            } else if (x == -1) {
-                Motor01.setVelocity(velocity);
-                Motor02.setVelocity(velocity);
-                Motor03.setVelocity(velocity);
-                Motor04.setVelocity(velocity);
+            if (y == -1) {
+                backPower = -y;
+                rightPower = y;
+                frontPower = -y;
+                leftPower = y;
+            }
+
+            if (x == 1) {
+                backPower = x;
+                rightPower = x;
+                frontPower = x;
+                leftPower = x;
+            }
+
+            if (x == -1) {
+                backPower = -x;
+                rightPower = -x;
+                frontPower = -x;
+                leftPower = -x;
             }
 
             if (rotate == 1){
-                Motor01.setVelocity(-velocity);
-                Motor02.setVelocity(velocity);
-                Motor03.setVelocity(velocity);
-                Motor04.setVelocity(-velocity);
+                rightPower = -rotate;
+                leftPower =   rotate;
+                frontPower = -rotate;
+                backPower =   rotate;
             } else if (rotate == -1){
-                Motor01.setVelocity(velocity);
-                Motor02.setVelocity(-velocity);
-                Motor03.setVelocity(-velocity);
-                Motor04.setVelocity(velocity);
+                rightPower =-rotate;
+                leftPower =  rotate;
+                frontPower =-rotate;
+                backPower =  rotate;
             }
 
+
             if (gamepad1.right_trigger > 0){
-                velocity = 466.7;
+                 slow = 2;
             }
 
             if (gamepad1.right_bumper){
-                velocity = 1400;
+                slow = 1;
             }
+
+            Motor01.setPower(frontPower / slow);
+            Motor02.setPower(backPower / slow);
+            Motor03.setPower(leftPower / slow);
+            Motor04.setPower(rightPower / slow);
 
             handleArmMovement();
             if (gamepad1.b){
@@ -104,11 +110,9 @@ public class Movement_revamp extends LinearOpMode {
             }
 
             if (gamepad1.left_bumper){
-                GearMotor.setVelocity(velocity);
+                GearMotor.setPower(1);
             } else if (gamepad1.left_trigger > 0) {
-                GearMotor.setVelocity(-velocity);
-            } else {
-                GearMotor.setVelocity(still);
+                GearMotor.setPower(-1);
             }
 
             Controll_hand();
@@ -116,7 +120,7 @@ public class Movement_revamp extends LinearOpMode {
         }
     }
 
-    private void initializeHardware(){
+    private void initializeHardware() {
 
         Motor01 = hardwareMap.get(DcMotorEx.class, "Motor01");
         Motor02 = hardwareMap.get(DcMotorEx.class, "Motor02");
@@ -128,8 +132,13 @@ public class Movement_revamp extends LinearOpMode {
         Motor03.setDirection(DcMotor.Direction.REVERSE);
         Motor04.setDirection(DcMotor.Direction.FORWARD);
 
-        GearMotor = hardwareMap.get(DcMotorEx.class, "GearMotor");
-        GearMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        Motor01.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Motor02.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Motor03.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        Motor04.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+
+        GearMotor = hardwareMap.get(DcMotor.class, "GearMotor");
 
         Servo_arm1 = hardwareMap.get(Servo.class, "servo_arm1");
         Servo_arm2 = hardwareMap.get(Servo.class, "servo_arm2");
@@ -341,21 +350,12 @@ public class Movement_revamp extends LinearOpMode {
 
     private void Grab_Pixel(){
         if (gamepad1.x) {
-            if (Isit_1) {
-                if ((Pixel_servo.getPosition() != 0) && (runtime.milliseconds() >= 1500)){
-                    Pixel_servo.setPosition(0);
-                }
-                if (!isMovingToPosition1) {
+                if (Pixel_servo.getPosition() == 0){
                     Pixel_servo.setPosition(0.5);
-                    runtime.reset(); // Reset the timer when setting position to 0.5
-                    isMovingToPosition1 = true;
+                } else if(Pixel_servo.getPosition() == 0.5){
+                    Pixel_servo.setPosition(1);
                 } else {
-                    if (runtime.milliseconds() >= 1500) { // Check elapsed time
-                        Pixel_servo.setPosition(1);
-                        Isit_1 = false;
-                        isMovingToPosition1 = false;
-                    }
-                }
+                    Pixel_servo.setPosition(0);
                 }
             }
         }
