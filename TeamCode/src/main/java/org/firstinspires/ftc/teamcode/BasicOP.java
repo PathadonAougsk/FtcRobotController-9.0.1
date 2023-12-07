@@ -100,8 +100,8 @@
                     BackDrive = hardwareMap.get(DcMotor.class, "Motor02"); //1
                     leftDrive  = hardwareMap.get(DcMotor.class, "Motor03"); //2
                     rightDrive = hardwareMap.get(DcMotor.class, "Motor04"); //3
-                    leftServo = hardwareMap.get(Servo.class, "servo_1"); //0
-                    rightServo = hardwareMap.get(Servo.class, "servo_2"); //1
+//                    leftServo = hardwareMap.get(Servo.class, "servo_1"); //0
+//                    rightServo = hardwareMap.get(Servo.class, "servo_2"); //1
                     // To drive forward, most robots need the motor on one side to be reversed, because the axles point in opposite directions.
                     // Pushing the left stick forward MUST make robot go forward. So adjust these two lines based on your first test drive.
                     // Note: The settings here assume direct drive on left and right wheels.  Gear Reduction or 90 Deg drives may require direction flips

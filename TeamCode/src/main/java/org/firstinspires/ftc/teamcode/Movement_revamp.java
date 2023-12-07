@@ -28,22 +28,90 @@ public class Movement_revamp extends LinearOpMode {
             if (gamepad1.x && gamepad1.y && gamepad1.dpad_up){
                 Debug();
             }
+
             double x = gamepad1.left_stick_x;
             double y = gamepad1.left_stick_y;
             double rotate = gamepad1.right_stick_x;
+            if (x != 1 && y != 1){
+                Motor01.setVelocity(still);
+                Motor02.setVelocity(still);
+                Motor03.setVelocity(still);
+                Motor04.setVelocity(still);
+            } else if (x != -1 && y != -1){
+                Motor01.setVelocity(still);
+                Motor02.setVelocity(still);
+                Motor03.setVelocity(still);
+                Motor04.setVelocity(still);
+            }
 
-            if (gamepad1.right_bumper){
+            if (y == 1){
+                Motor01.setVelocity(-velocity);
+                Motor02.setVelocity(-velocity);
+                Motor03.setVelocity(velocity);
+                Motor04.setVelocity(velocity);
+            } else if (y == -1) {
+                Motor01.setVelocity(velocity);
+                Motor02.setVelocity(velocity);
+                Motor03.setVelocity(-velocity);
+                Motor04.setVelocity(-velocity);
+            }
+
+            if (x == 1){
+                Motor01.setVelocity(-velocity);
+                Motor02.setVelocity(-velocity);
+                Motor03.setVelocity(-velocity);
+                Motor04.setVelocity(-velocity);
+            } else if (x == -1) {
+                Motor01.setVelocity(velocity);
+                Motor02.setVelocity(velocity);
+                Motor03.setVelocity(velocity);
+                Motor04.setVelocity(velocity);
+            }
+
+            if (rotate == 1){
+                Motor01.setVelocity(-velocity);
+                Motor02.setVelocity(velocity);
+                Motor03.setVelocity(velocity);
+                Motor04.setVelocity(-velocity);
+            } else if (rotate == -1){
+                Motor01.setVelocity(velocity);
+                Motor02.setVelocity(-velocity);
+                Motor03.setVelocity(-velocity);
+                Motor04.setVelocity(velocity);
+            }
+
+            if (gamepad1.right_trigger > 0){
                 velocity = 466.7;
             }
 
-            if (gamepad1.left_bumper){
+            if (gamepad1.right_bumper){
                 velocity = 1400;
             }
 
-            handle_control(x, y, rotate);
             handleArmMovement();
-            handleHandMovement();
+            if (gamepad1.b){
+                PickPixel();
+            }
+
+            if (gamepad1.a){
+                Prepare_drop();
+            }
+
             Grab_Pixel();
+
+            if (gamepad1.y){
+                Airplane.setPosition(1);
+            }
+
+            if (gamepad1.left_bumper){
+                GearMotor.setVelocity(velocity);
+            } else if (gamepad1.left_trigger > 0) {
+                GearMotor.setVelocity(-velocity);
+            } else {
+                GearMotor.setVelocity(still);
+            }
+
+            Controll_hand();
             telemetry_output();
         }
     }
@@ -73,61 +141,30 @@ public class Movement_revamp extends LinearOpMode {
         Servo_arm1.setDirection(Servo.Direction.REVERSE);
         Servo_hand1.setDirection(Servo.Direction.REVERSE);
 
-        Pixel_servo.scaleRange(0, 0.7);
+        Pixel_servo.scaleRange(0, 0.8);
 //        Servo_arm1.scaleRange(0, 0.8);
 //        Servo_arm2.scaleRange(0, 0.8);
         Pixel_servo.setPosition(1);
     }
 
-    private void handle_control(double x, double y, double rotate){
-        if (x != 1 && y != 1){
-            Motor01.setVelocity(still);
-            Motor02.setVelocity(still);
-            Motor03.setVelocity(still);
-            Motor04.setVelocity(still);
-        } else if (x != -1 && y != -1){
-            Motor01.setVelocity(still);
-            Motor02.setVelocity(still);
-            Motor03.setVelocity(still);
-            Motor04.setVelocity(still);
+    private  void Controll_hand(){
+        double HAND_ADJUSTMENT = 0.005;
+        long SERVO_UPDATE_INTERVAL = 10;
+        if (gamepad1.dpad_up && System.currentTimeMillis() - lastServoUpdateTime > SERVO_UPDATE_INTERVAL) {
+            range_motor_hand -= HAND_ADJUSTMENT;
+            Servo_hand1.setPosition(range_motor_hand);
+            Servo_hand2.setPosition(range_motor_hand);
+            lastServoUpdateTime = System.currentTimeMillis();
         }
 
-        if (y == 1){
-            Motor01.setVelocity(-velocity);
-            Motor02.setVelocity(-velocity);
-            Motor03.setVelocity(velocity);
-            Motor04.setVelocity(velocity);
-        } else if (y == -1) {
-            Motor01.setVelocity(velocity);
-            Motor02.setVelocity(velocity);
-            Motor03.setVelocity(-velocity);
-            Motor04.setVelocity(-velocity);
-        }
-
-        if (x == 1){
-            Motor01.setVelocity(-velocity);
-            Motor02.setVelocity(-velocity);
-            Motor03.setVelocity(-velocity);
-            Motor04.setVelocity(-velocity);
-        } else if (x == -1) {
-            Motor01.setVelocity(velocity);
-            Motor02.setVelocity(velocity);
-            Motor03.setVelocity(velocity);
-            Motor04.setVelocity(velocity);
-        }
-
-        if (rotate == 1){
-            Motor01.setVelocity(-velocity);
-            Motor02.setVelocity(velocity);
-            Motor03.setVelocity(velocity);
-            Motor04.setVelocity(-velocity);
-        } else if (rotate == -1){
-            Motor01.setVelocity(velocity);
-            Motor02.setVelocity(-velocity);
-            Motor03.setVelocity(-velocity);
-            Motor04.setVelocity(velocity);
+        if (gamepad1.dpad_down && System.currentTimeMillis() - lastServoUpdateTime > SERVO_UPDATE_INTERVAL) {
+            range_motor_hand += HAND_ADJUSTMENT;
+            Servo_hand1.setPosition(range_motor_hand);
+            Servo_hand2.setPosition(range_motor_hand);
+            lastServoUpdateTime = System.currentTimeMillis();
         }
     }
+
     private void handleArmMovement() {
 
         if (range_motor_arm  > 1){
@@ -136,44 +173,36 @@ public class Movement_revamp extends LinearOpMode {
             range_motor_arm = 0;
         }
 
-        range_motor_arm = (Servo_arm1.getPosition() + (0.025 * gamepad2.left_stick_y));
+        range_motor_arm = (Servo_arm1.getPosition() + (0.025 * gamepad1.right_stick_y));
         Servo_arm1.setPosition(range_motor_arm);
         Servo_arm2.setPosition(range_motor_arm);
-
-        if(gamepad1.y){
-            GearMotor.setVelocity(velocity);
-        } else if (gamepad1.x){
-            GearMotor.setVelocity(-velocity);
-        }else {
-            GearMotor.setVelocity(still);
-        }
-
-        if (gamepad1.a){
-            Airplane.setPosition(1);
-        }
-
-        if (gamepad2.a){
-            Pixel_servo.setPosition(0);
-        }
     }
 
 
-    private void handleHandMovement() {
-        double HAND_ADJUSTMENT = 0.05;
-        long SERVO_UPDATE_INTERVAL = 10;
-        if (gamepad2.right_bumper && System.currentTimeMillis() - lastServoUpdateTime > SERVO_UPDATE_INTERVAL) {
-            range_motor_hand -= HAND_ADJUSTMENT;
-            Servo_hand1.setPosition(range_motor_hand);
-            Servo_hand2.setPosition(range_motor_hand);
-            lastServoUpdateTime = System.currentTimeMillis();
+    private void PickPixel() {
+        Pixel_servo.setPosition(0);
+        while (true){
+            Servo_arm1.setPosition(Servo_arm1.getPosition() + 0.001);
+            Servo_arm2.setPosition(Servo_arm2.getPosition() + 0.001);
+
+            if ((Servo_arm1.getPosition() == 1) && (Servo_arm2.getPosition() == 1))
+            {
+                break;
+            }
         }
 
-        if (gamepad2.left_bumper && System.currentTimeMillis() - lastServoUpdateTime > SERVO_UPDATE_INTERVAL) {
-            range_motor_hand += HAND_ADJUSTMENT;
-            Servo_hand1.setPosition(range_motor_hand);
-            Servo_hand2.setPosition(range_motor_hand);
-            lastServoUpdateTime = System.currentTimeMillis();
-        }
+        Servo_hand1.setPosition(0.45);
+        Servo_hand2.setPosition(0.45);
+        sleep(500);
+        Pixel_servo.setPosition(1);
+    }
+
+    private void Prepare_drop(){
+        Servo_arm1.setPosition(0.75);
+        Servo_arm2.setPosition(0.75);
+        Servo_hand1.setPosition(0.45);
+        Servo_hand2.setPosition(0.45);
+        Pixel_servo.setPosition(1);
     }
 
     private void Debug() {
@@ -311,8 +340,11 @@ public class Movement_revamp extends LinearOpMode {
     }
 
     private void Grab_Pixel(){
-        if (gamepad2.b) {
+        if (gamepad1.x) {
             if (Isit_1) {
+                if ((Pixel_servo.getPosition() != 0) && (runtime.milliseconds() >= 1500)){
+                    Pixel_servo.setPosition(0);
+                }
                 if (!isMovingToPosition1) {
                     Pixel_servo.setPosition(0.5);
                     runtime.reset(); // Reset the timer when setting position to 0.5
@@ -324,22 +356,8 @@ public class Movement_revamp extends LinearOpMode {
                         isMovingToPosition1 = false;
                     }
                 }
-            } else {
-                if (!isMovingToPosition1) {
-                    Pixel_servo.setPosition(1);
-                    runtime.reset(); // Reset the timer when setting position to 1
-                    isMovingToPosition1 = true;
-                } else {
-                    if (runtime.milliseconds() >= 1500) { // Check elapsed time
-                        Pixel_servo.setPosition(0.5);
-                        Isit_1 = true;
-                        isMovingToPosition1 = false;
-                    }
                 }
             }
         }
     }
-
-
-  }
 
